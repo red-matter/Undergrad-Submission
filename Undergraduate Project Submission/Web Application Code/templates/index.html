@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html >
+<head>
+  <meta charset="UTF-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Persona Prediction</title>
+  <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/style.css') }}">
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
+</head>
+
+<body>
+<div class="container">
+    <form id="Form1">
+     <h2>PERSONAL INFO</h2>
+     <input type="text" placeholder="Full Name" required id="Name"/>
+     <input type= "text" placeholder="City of Residence" required>
+     <br>
+     <br>
+     <label for="job title" aria-required="true">What job are you applying for:</label>
+     <select name="job title" id="job title">
+         <option value="Machine Learning Engineer">Machine Learning Engineer</option>
+         <option value="Data Scientist">Data Scientist</option>
+         <option value="Web Designer">Web Designer</option>
+         <option value="Cybersecurity Engineer">Cybersecurity Engineer</option>
+         <option value="Data Scientist">Data Scientist</option>
+         <option value="Mobile App Developer">Mobile App Developer</option>
+     </select>
+     <div class="btn-box">
+      <button type="button" id="Next1">Next</button>
+     </div>
+    </form>
+    <form id="Form2">
+      <h2>TECHNICAL SECTION</h2>
+      <br>
+      <h3>Provide the most efficient algorithm in python that gives the desired output according to the examples below:</h3>
+      <img src="static\styles\examples.png" alt="examples">
+      <input type= "text" placeholder="Write your code here" required id="code"/>
+
+      <div class="btn-box">
+        <button type="button" id="Back1">Back</button>
+        <button type="button" id="Next2">Next</button>
+      </div>
+    </form>
+
+    <form id="Form3">
+      <h2>BEHAVIOURAL SECTION</h2>
+      <br>
+      <p>How do you learn a new skill or adapt to a new situation quickly?</p>
+    	<input type="text" required="required" name="answer1"/><br>
+      <p>How do you approach solving complex problems or thinking outside the box?</p>
+      <input type="text" required="required" name="answer2"/><p>
+
+      <p>How do you stay organized and ensure that your work meets high standards?</p>
+      <input type="text" required="required" name="answer3"/><br>
+      <p>Have you ever had to handle a task that required you to be very detail-oriented? How did you ensure accuracy?</p>
+      <input type="text" required="required" name="answer4"/><p>
+
+      <p>How did you contribute a group's dynamic?</p>
+      <input type="text" required="required" name="answer5"/><br>
+      <p>How do you stay motivated in environments where collaboration and communication are important?</p>
+      <input type="text" required="required" name="answer6"/><p>
+
+      <p>How do you handle resolving conflicts at work?</p>
+      <input type="text" required="required" name="answer7"/><br>
+      <p>How do you approach working with individuals who have different opinions or working styles?</p>
+      <input type="text" required="required" name="answer8"/><p>
+
+      <p>How do you manage stress or pressure in the workplace, especially when dealing with tight deadlines?</p>
+      <input type="text" required="required" name="answer9"/><br>
+      <p>How do you react and what steps did you take after receiving critical feedback?</p>
+      <input type="text" required="required" name="answer10"/><p>
+      
+      <div class="btn-box">
+        <button type="button" id="Back2">Back</button>
+        <button type="submit" class="btn btn-primary btn-block btn-large" id="Submit">Submit</button></p>
+      </div>
+    </form>
+
+    <div class="step-row">
+      <div id="progress"></div>
+      <div class="step-col"><small>Step 1</small></div>
+      <div class="step-col"><small>Step 2</small></div>
+      <div class="step-col"><small>Step 3</small></div>
+      <div class="step-col"><small>Finish</small></div>
+    </div>
+
+
+    <div id="Results">
+      <h2 id="Username"></h2>
+      <h3 id= "Score"></h3>
+      <div id="result"></div>
+      <canvas id="Chart" width="400" height="200"></canvas>
+    </div>
+ </div>
+
+ <script>
+    var Form1 = document.getElementById("Form1");
+    var Form2 = document.getElementById("Form2");
+    var Form3 = document.getElementById("Form3");
+    var Results = document.getElementById("Results");;
+
+    var Next1 = document.getElementById("Next1");
+    var Next2 = document.getElementById("Next2");
+
+    var Back1 = document.getElementById("Back1");
+    var Back2 = document.getElementById("Back2");
+
+    var Submit = document.getElementById("Submit");
+    var score = "Technical Interview Score: 0/10"; 
+
+    Next1.onclick = function(){
+      Form1.style.display = "none";
+      Form2.style.display = "block";
+
+      const Name = document.getElementById("Name");
+      const nameValue = Name.value;
+      document.getElementById('Username').innerHTML = nameValue;
+
+      progress.style.right = "50%";
+    }
+
+    Next2.onclick = function(){
+      Form2.style.display = "none";
+      Form3.style.display = "block";
+
+      const Code = document.getElementById("code");
+      const codeValue = Code.value;
+
+      if(codeValue == "num**3"){
+        score = "Technical Interview Score: 10/10"
+      }else if(codeValue == "num*num*num"){
+        score = "Technical Interview Score: 5/10"
+      }
+
+      document.getElementById('Score').innerHTML = score;
+
+      progress.style.right = "33.5%";
+    }
+
+    Back1.onclick = function(){
+      Form2.style.display = "none";
+      Form1.style.display = "block";
+
+      progress.style.right = "66%";
+    }
+
+    Back2.onclick = function(){
+      Form3.style.display = "none";
+      Form2.style.display = "block";
+
+      progress.style.right = "50%";
+    }
+
+    Submit.onclick = function(){
+      Form3.style.display = "none";
+      Results.style.display = "block";
+
+      progress.style.right = "0%";
+    }
+
+    $(document).ready(function() {
+            $('#Form3').on('submit', function(event) {
+                event.preventDefault(); 
+
+                $.ajax({
+                    url: '/predict', 
+                    type: 'POST',
+                    data: $(this).serialize(), 
+                    success: function(response) {
+                        
+                        $('#result').html(
+                          ` <p>Neuroticism: ${response.neuroticism}</p>
+                            <p>Agreeable: ${response.agreeable}</p>
+                            <p>Conscientiousness: ${response.conscientiousness}</p>
+                            <p>Openness to Experience: ${response.openness_to_experience}</p>
+                            <p>Extraverted: ${response.extraverted}</p>`
+                        );
+
+                const values = [
+                    response.neuroticism,
+                    response.agreeable,
+                    response.conscientiousness,
+                    response.openness_to_experience,
+                    response.extraverted
+                ];
+
+                const total = values.reduce((acc, val) => acc + val, 0);
+
+                const fractions = values.map(value => value / total);
+
+                const labels = ['Neuroticism', 'Agreeable', 'Conscientiousness', 'Openness to Experience', 'Extraverted'];
+
+                const ctx = document.getElementById('Chart').getContext('2d');
+                const myChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Character Percent Composition',
+                            data: fractions,
+                            backgroundColor: 'rgba(128, 0, 128, 0.2)',
+                            borderColor: 'rgba(128, 0, 128, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'Percentages'
+                                },
+                                ticks: {
+                                    callback: (value) => `${(value * 100).toFixed(0)}%`
+                                }
+                            }
+                        }
+                    }
+                });
+                    },
+                    error: function(error) {
+                        
+                        console.error('Error:', error);
+                    }
+                });
+            });
+        });
+ </script>
+</body>
+</html>

@@ -1,0 +1,1 @@
+To run the file (assuming the pc running it already has all basic python dependencess installed) run the app.py file
